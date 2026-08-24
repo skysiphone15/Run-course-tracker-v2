@@ -1,0 +1,1015 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<title>Run & Course Tracker</title>
+
+<style>
+
+:root{
+
+  color-scheme:light dark;
+
+  --bg:#111;
+
+  --card:#1d1d1d;
+
+  --text:#f5f5f5;
+
+  --muted:#aaa;
+
+  --run:#287a43;
+
+  --course:#275da8;
+
+  --stop:#a63232;
+
+  --border:#333;
+
+}
+
+*{box-sizing:border-box}
+
+body{
+
+  margin:0;
+
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+
+  background:var(--bg);
+
+  color:var(--text);
+
+}
+
+.app{
+
+  max-width:760px;
+
+  margin:0 auto;
+
+  padding:20px 16px 40px;
+
+}
+
+.title{
+
+  font-size:28px;
+
+  font-weight:800;
+
+  margin:4px 0 18px;
+
+}
+
+.banner{
+
+  display:none;
+
+  margin-bottom:14px;
+
+  padding:12px 14px;
+
+  border:1px solid #6d581c;
+
+  border-radius:14px;
+
+  background:#3a2f0a;
+
+  font-weight:800;
+
+}
+
+.grid{
+
+  display:grid;
+
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+
+  gap:16px;
+
+}
+
+.card{
+
+  background:var(--card);
+
+  border:1px solid var(--border);
+
+  border-radius:18px;
+
+  padding:18px;
+
+}
+
+.label{
+
+  font-size:13px;
+
+  font-weight:800;
+
+  letter-spacing:.08em;
+
+  text-transform:uppercase;
+
+  color:var(--muted);
+
+}
+
+.time{
+
+  font-size:48px;
+
+  font-weight:850;
+
+  font-variant-numeric:tabular-nums;
+
+  margin:10px 0 14px;
+
+}
+
+.btn{
+
+  width:100%;
+
+  min-height:64px;
+
+  border:0;
+
+  border-radius:16px;
+
+  color:#fff;
+
+  font-size:21px;
+
+  font-weight:850;
+
+}
+
+.run{background:var(--run)}
+
+.course{background:var(--course)}
+
+.stop{background:var(--stop)!important}
+
+.stats{
+
+  display:grid;
+
+  grid-template-columns:repeat(3,1fr);
+
+  gap:10px;
+
+  text-align:center;
+
+}
+
+.stat strong{
+
+  display:block;
+
+  font-size:28px;
+
+}
+
+.stat span{
+
+  font-size:12px;
+
+  color:var(--muted);
+
+}
+
+.section-title{
+
+  font-size:18px;
+
+  font-weight:800;
+
+  margin-bottom:10px;
+
+}
+
+.history{
+
+  display:grid;
+
+  gap:8px;
+
+}
+
+.row{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  gap:14px;
+
+  padding:12px 14px;
+
+  border-radius:12px;
+
+  background:#252525;
+
+}
+
+.row span{
+
+  font-variant-numeric:tabular-nums;
+
+}
+
+.muted{
+
+  color:var(--muted);
+
+  font-size:13px;
+
+}
+
+.actions{
+
+  display:flex;
+
+  gap:10px;
+
+  margin-top:12px;
+
+}
+
+.small{
+
+  flex:1;
+
+  min-height:44px;
+
+  border-radius:12px;
+
+  border:1px solid #444;
+
+  background:transparent;
+
+  color:inherit;
+
+  font-weight:700;
+
+}
+
+.note{
+
+  margin-top:14px;
+
+  font-size:12px;
+
+  color:var(--muted);
+
+}
+
+@media (prefers-color-scheme:light){
+
+  :root{
+
+    --bg:#f5f5f2;
+
+    --card:#fff;
+
+    --text:#171717;
+
+    --muted:#666;
+
+    --border:#ddd;
+
+  }
+
+  .row{background:#ecece8}
+
+  .banner{background:#fff3cd;color:#3a2f0a}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="title">Run & Course Tracker</div>
+
+  <div id="activeBanner" class="banner"></div>
+
+  <div class="grid">
+
+    <section class="card">
+
+      <div class="label">744 ft run</div>
+
+      <div id="runTime" class="time">00:00.00</div>
+
+      <button id="runBtn" class="btn run" type="button">START RUN</button>
+
+    </section>
+
+    <section class="card">
+
+      <div class="label">Basketball course</div>
+
+      <div id="courseTime" class="time">00:00.00</div>
+
+      <button id="courseBtn" class="btn course" type="button">START COURSE</button>
+
+    </section>
+
+  </div>
+
+  <section class="card" style="margin-top:16px">
+
+    <div class="stats">
+
+      <div class="stat">
+
+        <span>RUNS</span>
+
+        <strong id="runCount">0</strong>
+
+      </div>
+
+      <div class="stat">
+
+        <span>DISTANCE</span>
+
+        <strong id="distance">0 ft</strong>
+
+      </div>
+
+      <div class="stat">
+
+        <span>COURSES</span>
+
+        <strong id="courseCount">0</strong>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <section class="card" style="margin-top:16px">
+
+    <div class="section-title">Today's activity</div>
+
+    <div id="history" class="history">
+
+      <div id="empty" class="muted">No results yet.</div>
+
+    </div>
+
+    <div class="actions">
+
+      <button id="deleteLastBtn" class="small" type="button">Delete last</button>
+
+      <button id="resetBtn" class="small" type="button">Reset today</button>
+
+    </div>
+
+    <div class="note">
+
+      Timers use the phone's clock, so elapsed time stays accurate if Safari goes into the background or the screen locks.
+
+    </div>
+
+  </section>
+
+</div>
+
+<script>
+
+(() => {
+
+  const RUN_FEET = 744;
+
+  const STORAGE_KEY = 'runCourseTrackerV2';
+
+  const ACTIVE_KEY = 'runCourseTrackerV2Active';
+
+  const state = {
+
+    activeDay: dayKey(),
+
+    entries: [],
+
+    active: {
+
+      run: null,
+
+      course: null
+
+    },
+
+    intervals: {
+
+      run: null,
+
+      course: null
+
+    }
+
+  };
+
+  function dayKey() {
+
+    const d = new Date();
+
+    return d.getFullYear()
+
+      + '-'
+
+      + String(d.getMonth() + 1).padStart(2, '0')
+
+      + '-'
+
+      + String(d.getDate()).padStart(2, '0');
+
+  }
+
+  function fmt(ms) {
+
+    ms = Math.max(0, ms);
+
+    const m = Math.floor(ms / 60000);
+
+    const s = Math.floor((ms % 60000) / 1000);
+
+    const cs = Math.floor((ms % 1000) / 10);
+
+    return String(m).padStart(2, '0')
+
+      + ':'
+
+      + String(s).padStart(2, '0')
+
+      + '.'
+
+      + String(cs).padStart(2, '0');
+
+  }
+
+  function load() {
+
+    try {
+
+      const saved = JSON.parse(
+
+        localStorage.getItem(STORAGE_KEY) || 'null'
+
+      );
+
+      if (
+
+        saved
+
+        && saved.activeDay === state.activeDay
+
+        && Array.isArray(saved.entries)
+
+      ) {
+
+        state.entries = saved.entries;
+
+      }
+
+    } catch (e) {}
+
+    try {
+
+      const active = JSON.parse(
+
+        localStorage.getItem(ACTIVE_KEY) || 'null'
+
+      );
+
+      if (active && typeof active === 'object') {
+
+        for (const kind of ['run', 'course']) {
+
+          const v = Number(active[kind]);
+
+          state.active[kind] =
+
+            Number.isFinite(v) && v > 0
+
+              ? v
+
+              : null;
+
+        }
+
+      }
+
+    } catch (e) {}
+
+  }
+
+  function save() {
+
+    localStorage.setItem(
+
+      STORAGE_KEY,
+
+      JSON.stringify({
+
+        activeDay: state.activeDay,
+
+        entries: state.entries
+
+      })
+
+    );
+
+  }
+
+  function saveActive() {
+
+    localStorage.setItem(
+
+      ACTIVE_KEY,
+
+      JSON.stringify(state.active)
+
+    );
+
+  }
+
+  function renderStats() {
+
+    const runs =
+
+      state.entries.filter(e => e.kind === 'run').length;
+
+    const courses =
+
+      state.entries.filter(e => e.kind === 'course').length;
+
+    document.getElementById('runCount').textContent =
+
+      runs;
+
+    document.getElementById('courseCount').textContent =
+
+      courses;
+
+    document.getElementById('distance').textContent =
+
+      (runs * RUN_FEET).toLocaleString() + ' ft';
+
+  }
+
+  function renderHistory() {
+
+    const history =
+
+      document.getElementById('history');
+
+    history.innerHTML = '';
+
+    if (!state.entries.length) {
+
+      history.innerHTML =
+
+        '<div id="empty" class="muted">No results yet.</div>';
+
+      return;
+
+    }
+
+    [...state.entries]
+
+      .reverse()
+
+      .forEach(entry => {
+
+        const row =
+
+          document.createElement('div');
+
+        row.className = 'row';
+
+        const label =
+
+          entry.kind === 'run'
+
+            ? 'Run · 744 ft'
+
+            : 'Basketball course';
+
+        row.innerHTML =
+
+          '<strong>'
+
+          + label
+
+          + '</strong><span>'
+
+          + fmt(entry.elapsed)
+
+          + '</span>';
+
+        history.appendChild(row);
+
+      });
+
+  }
+
+  function renderBanner() {
+
+    const banner =
+
+      document.getElementById('activeBanner');
+
+    const parts = [];
+
+    for (const kind of ['run', 'course']) {
+
+      if (state.active[kind]) {
+
+        parts.push(
+
+          (kind === 'run' ? 'RUN' : 'COURSE')
+
+          + ' IN PROGRESS — '
+
+          + fmt(Date.now() - state.active[kind])
+
+        );
+
+      }
+
+    }
+
+    if (parts.length) {
+
+      banner.style.display = 'block';
+
+      banner.textContent =
+
+        parts.join(' • ');
+
+    } else {
+
+      banner.style.display = 'none';
+
+      banner.textContent = '';
+
+    }
+
+  }
+
+  function setButton(kind, running) {
+
+    const btn =
+
+      document.getElementById(kind + 'Btn');
+
+    btn.textContent =
+
+      running
+
+        ? 'STOP ' + kind.toUpperCase()
+
+        : 'START ' + kind.toUpperCase();
+
+    btn.classList.toggle(
+
+      'stop',
+
+      running
+
+    );
+
+  }
+
+  function tick(kind) {
+
+    const started =
+
+      state.active[kind];
+
+    if (!started) return;
+
+    document.getElementById(
+
+      kind + 'Time'
+
+    ).textContent =
+
+      fmt(Date.now() - started);
+
+    renderBanner();
+
+  }
+
+  function start(kind) {
+
+    if (state.active[kind]) return;
+
+    state.active[kind] =
+
+      Date.now();
+
+    saveActive();
+
+    setButton(
+
+      kind,
+
+      true
+
+    );
+
+    tick(kind);
+
+    clearInterval(
+
+      state.intervals[kind]
+
+    );
+
+    state.intervals[kind] =
+
+      setInterval(
+
+        () => tick(kind),
+
+        50
+
+      );
+
+  }
+
+  function stop(kind) {
+
+    const started =
+
+      state.active[kind];
+
+    if (!started) return;
+
+    const elapsed =
+
+      Math.max(
+
+        0,
+
+        Date.now() - started
+
+      );
+
+    clearInterval(
+
+      state.intervals[kind]
+
+    );
+
+    state.intervals[kind] =
+
+      null;
+
+    state.active[kind] =
+
+      null;
+
+    saveActive();
+
+    setButton(
+
+      kind,
+
+      false
+
+    );
+
+    document.getElementById(
+
+      kind + 'Time'
+
+    ).textContent =
+
+      fmt(elapsed);
+
+    state.entries.push({
+
+      kind: kind,
+
+      elapsed: elapsed,
+
+      createdAt: new Date().toISOString()
+
+    });
+
+    save();
+
+    renderStats();
+
+    renderHistory();
+
+    renderBanner();
+
+  }
+
+  function toggle(kind) {
+
+    if (state.active[kind]) {
+
+      stop(kind);
+
+    } else {
+
+      start(kind);
+
+    }
+
+  }
+
+  function restoreActiveTimers() {
+
+    for (const kind of ['run', 'course']) {
+
+      if (state.active[kind]) {
+
+        setButton(
+
+          kind,
+
+          true
+
+        );
+
+        tick(kind);
+
+        clearInterval(
+
+          state.intervals[kind]
+
+        );
+
+        state.intervals[kind] =
+
+          setInterval(
+
+            () => tick(kind),
+
+            50
+
+          );
+
+      }
+
+    }
+
+    renderBanner();
+
+  }
+
+  document
+
+    .getElementById('runBtn')
+
+    .addEventListener(
+
+      'click',
+
+      () => toggle('run')
+
+    );
+
+  document
+
+    .getElementById('courseBtn')
+
+    .addEventListener(
+
+      'click',
+
+      () => toggle('course')
+
+    );
+
+  document
+
+    .getElementById('deleteLastBtn')
+
+    .addEventListener(
+
+      'click',
+
+      () => {
+
+        if (!state.entries.length) return;
+
+        state.entries.pop();
+
+        save();
+
+        renderStats();
+
+        renderHistory();
+
+      }
+
+    );
+
+  document
+
+    .getElementById('resetBtn')
+
+    .addEventListener(
+
+      'click',
+
+      () => {
+
+        if (
+
+          !confirm(
+
+            "Reset all of today's saved results?"
+
+          )
+
+        ) {
+
+          return;
+
+        }
+
+        state.entries = [];
+
+        save();
+
+        renderStats();
+
+        renderHistory();
+
+      }
+
+    );
+
+  window.addEventListener(
+
+    'pageshow',
+
+    () => {
+
+      for (const kind of ['run', 'course']) {
+
+        tick(kind);
+
+      }
+
+    }
+
+  );
+
+  document.addEventListener(
+
+    'visibilitychange',
+
+    () => {
+
+      if (!document.hidden) {
+
+        for (const kind of ['run', 'course']) {
+
+          tick(kind);
+
+        }
+
+      }
+
+    }
+
+  );
+
+  load();
+
+  renderStats();
+
+  renderHistory();
+
+  restoreActiveTimers();
+
+})();
+
+</script>
+
+</body>
+
+</html>
