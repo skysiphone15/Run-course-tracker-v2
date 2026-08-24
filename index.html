@@ -951,19 +951,38 @@ body{
         }
 
         state.entries = [];
-      document.getElementById('runTime').textContent = '00:00.00';
+
+for (const kind of ['run', 'course']) {
+
+  clearInterval(state.intervals[kind]);
+
+  state.intervals[kind] = null;
+
+  state.active[kind] = null;
+
+  setButton(kind, false);
+
+}
+
+saveActive();
+
+renderBanner();
+
+document.getElementById('runTime').textContent = '00:00.00';
+
 document.getElementById('courseTime').textContent = '00:00.00';
-        
 
-        save();
+save();
 
-        renderStats();
+renderStats();
 
-        renderHistory();
+renderHistory();
 
-      }
+}
 
-    );
+)
+
+ 
 
   window.addEventListener(
 
@@ -975,7 +994,7 @@ document.getElementById('courseTime').textContent = '00:00.00';
 
         tick(kind);
 
-      }
+      
 
     }
 
