@@ -329,7 +329,11 @@ body{
     </section>
 
   </div>
-
+<section class="card" style="margin-top:16px">
+  <button id="dayBtn" class="btn" type="button" style="background:#6b4f00">
+    START DAY
+  </button>
+</section>
   <section class="card" style="margin-top:16px">
 
     <div class="stats">
@@ -1008,7 +1012,79 @@ window.addEventListener(
     }
 
   );
+const dayBtn = document.getElementById('dayBtn');
 
+let dayActive = localStorage.getItem('dayActive') === 'true';
+
+function updateDayButton() {
+  dayBtn.textContent = dayActive ? 'FINISH DAY' : 'START DAY';
+  dayBtn.style.background = dayActive ? '#9b2c2c' : '#6b4f00';
+}
+
+dayBtn.addEventListener('click', () => {
+  if (!dayActive) {
+    dayActive = true;
+    localStorage.setItem('dayActive', 'true');
+    localStorage.setItem('dayStartedAt', new Date().toISOString());
+
+    updateDayButton();
+    return;
+  }
+
+  if (state.active.run || state.active.course) {
+    alert('Stop the running timer before finishing the day.');
+    return;
+  }
+
+  if (!confirm('Finish today and save these results?')) {
+    return;
+  }
+
+  const completedDays =
+    JSON.parse(localStorage.getItem('completedDays') || '[]');
+
+  const runEntries =
+    state.entries.filter(entry => entry.kind === 'run');
+
+  const courseEntries =
+    state.entries.filter(entry => entry.kind === 'course');
+
+  completedDays.push({
+    date: new Date().toLocaleDateString(),
+    startedAt: localStorage.getItem('dayStartedAt'),
+    finishedAt: new Date().toISOString(),
+    entries: state.entries,
+    runs: runEntries.length,
+    courses: courseEntries.length,
+    bestRun: runEntries.length
+      ? Math.min(...runEntries.map(entry => entry.elapsed))
+      : null,
+    bestCourse: courseEntries.length
+      ? Math.min(...courseEntries.map(entry => entry.elapsed))
+      : null
+  });
+
+  localStorage.setItem(
+    'completedDays',
+    JSON.stringify(completedDays)
+  );
+
+  dayActive = false;
+  localStorage.setItem('dayActive', 'false');
+  localStorage.removeItem('dayStartedAt');
+
+  state.entries = [];
+
+  document.getElementById('runTime').textContent = '00:00.00';
+  document.getElementById('courseTime').textContent = '00:00.00';
+
+  save();
+  renderStats();
+  renderHistory();
+  updateDayButton();
+});
+
+updateDayButton();
   load();
 
   renderStats();
