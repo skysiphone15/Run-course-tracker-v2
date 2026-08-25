@@ -950,55 +950,44 @@ body{
 
         }
 
-        state.entries = [];
+     state.entries = [];
 
 for (const kind of ['run', 'course']) {
-
   clearInterval(state.intervals[kind]);
-
   state.intervals[kind] = null;
-
   state.active[kind] = null;
-
   setButton(kind, false);
-
 }
 
 saveActive();
-
 renderBanner();
 
 document.getElementById('runTime').textContent = '00:00.00';
-
 document.getElementById('courseTime').textContent = '00:00.00';
 
 save();
-
 renderStats();
-
 renderHistory();
 
 }
+);
 
-)
+window.addEventListener(
+  'pageshow',
+  () => {
+    for (const kind of ['run', 'course']) {
+      tick(kind);
+    }
+  }
+);  
 
- 
-
-  window.addEventListener(
-
-    'pageshow',
-
-    () => {
-
-      for (const kind of ['run', 'course']) {
-
-        tick(kind);
+   
 
       
 
-    }
+    
 
-  );
+  
 
   document.addEventListener(
 
