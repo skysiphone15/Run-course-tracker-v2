@@ -391,7 +391,11 @@ body{
     </div>
 
   </section>
+<section class="card" style="margin-top:16px">
+  <div class="section-title">Progress</div>
 
+  <div id="progressGraph"></div>
+</section>
 </div>
 
 <script>
@@ -1020,6 +1024,85 @@ function updateDayButton() {
   dayBtn.textContent = dayActive ? 'FINISH DAY' : 'START DAY';
   dayBtn.style.background = dayActive ? '#9b2c2c' : '#6b4f00';
 }
+function renderProgressGraph() {
+  const graph = document.getElementById('progressGraph');
+
+  const days =
+    JSON.parse(localStorage.getItem('completedDays') || '[]');
+
+  if (!days.length) {
+    graph.innerHTML =
+      '<div class="muted">Finish a day to see progress.</div>';
+    return;
+  }
+
+  const maxTime = Math.max(
+    ...days.flatMap(day => [
+      day.bestRun || 0,
+      day.bestCourse || 0
+    ])
+  );
+
+  graph.innerHTML = days.map(day => {
+    const runHeight =
+      day.bestRun
+        ? Math.max(8, (day.bestRun / maxTime) * 140)
+        : 0;
+
+    const courseHeight =
+      day.bestCourse
+        ? Math.max(8, (day.bestCourse / maxTime) * 140)
+        : 0;
+
+    return `
+      <div style="
+        display:inline-flex;
+        flex-direction:column;
+        align-items:center;
+        margin:10px 12px;
+      ">
+        <div style="
+          height:160px;
+          display:flex;
+          align-items:flex-end;
+          gap:6px;
+        ">
+
+          <div
+            title="Run ${day.bestRun ? fmt(day.bestRun) : 'No time'}"
+            style="
+              width:32px;
+              height:${runHeight}px;
+              background:#287a43;
+              border-radius:7px 7px 0 0;
+            ">
+          </div>
+
+          <div
+            title="Course ${day.bestCourse ? fmt(day.bestCourse) : 'No time'}"
+            style="
+              width:32px;
+              height:${courseHeight}px;
+              background:#275da8;
+              border-radius:7px 7px 0 0;
+            ">
+          </div>
+
+        </div>
+
+        <div style="
+          margin-top:8px;
+          font-size:12px;
+          color:var(--muted);
+        ">
+          ${day.date}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+
 
 dayBtn.addEventListener('click', () => {
   if (!dayActive) {
@@ -1082,6 +1165,7 @@ dayBtn.addEventListener('click', () => {
   renderStats();
   renderHistory();
   updateDayButton();
+  renderProgressGraph();
 });
 
 updateDayButton();
@@ -1090,7 +1174,7 @@ updateDayButton();
   renderStats();
 
   renderHistory();
-
+renderProgressGraph();
   restoreActiveTimers();
 
 })();
